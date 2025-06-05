@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pemutar Musik Spotify</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      color: white;
+      background-image: url('https://wallpaperaccess.com/full/39640.jpg');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+
+    .overlay {
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.5);
+    }
+
+    h2, h3 {
+      text-align: center;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+
+    input {
+      background: rgba(255,255,255,0.1);
+      color: white;
+    }
+
+    button {
+      background-color: #1db954;
+      color: white;
+      cursor: pointer;
+    }
+
+    .song-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255,255,255,0.05);
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 8px;
+    }
+
+    .song-item img {
+      width: 50px;
+      height: 50px;
+      border-radius: 5px;
+    }
+
+    .song-info {
+      flex-grow: 1;
+      margin-left: 10px;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 10px;
+    }
+
+    .controls button {
+      width: 30%;
+      font-size: 18px;
+      background-color: rgba(255,255,255,0.1);
+    }
+
+    audio {
+      width: 100%;
+      margin-top: 20px;
+    }
+
+    .playlist {
+      margin-top: 20px;
+    }
+
+    .volume-slider {
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .toggle-theme {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .toggle-theme button {
+      background-color: #555;
+    }
+
+    body.light .overlay {
+      background: rgba(255, 255, 255, 0.6);
+      color: black;
+    }
+
+    body.light input {
+      background: rgba(0,0,0,0.1);
+      color: black;
+    }
+
+    body.light .container {
+      background: rgba(255,255,255,0.7);
+    }
+  </style>
+</head>
+<body>
+<div class="overlay">
+  <div class="container">
+    <div class="toggle-theme">
+      <button onclick="toggleTheme()">🌗 Ganti Mode</button>
+    </div>
+
+    <h2>🎧 Pemutar Musik Spotify</h2>
+
+    <input id="searchInput" placeholder="Cari lagu...">
+    <button onclick="searchSong()">Cari Lagu</button>
+
+    <div id="searchResults"></div>
+
+    <h3>Now Playing</h3>
+    <div id="nowPlaying"></div>
+
+    <audio id="audioPlayer" controls></audio>
+
+    <div class="controls">
+      <button onclick="prevSong()">⏮️</button>
+      <button onclick="nextSong()">⏭️</button>
+    </div>
+
+    <input type="range" min="0" max="1" step="0.01" class="volume-slider" id="volumeSlider" value="1">
+
+    <h3>🎵 Playlist</h3>
+    <div id="playlistContainer" class="playlist"></div>
+  </div>
+</div>
+
+<script>
+  let playlist = [];
+  let currentIndex = 0;
+
+  const audio = document.getElementById("audioPlayer");
+
+  function toggleTheme() {
+    document.body.classList.toggle("light");
+  }
+
+  document.getElementById("volumeSlider").addEventListener("input", function () {
+    audio.volume = this.value;
+  });
+
+  async function searchSong() {
+    const query = document.getElementById("searchInput").value;
+    document.getElementById("searchResults").innerHTML = "🔍 Mencari...";
+    const res = await fetch(`https://api.ownblox.my.id/api/spotifysearch?query=${encodeURIComponent(query)}`);
+    const data = await res.json();
+
+    if (data.result && data.result.length > 0) {
+      const resultHTML = data.result.map(song => `
+        <div class="song-item">
+          <img src="${song.thumbnail}">
+          <div class="song-info">
+            <strong>${song.title}</strong><br><small>${song.artists}</small>
+          </
+  
